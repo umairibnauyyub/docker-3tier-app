@@ -1,20 +1,35 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Frontend</title>
+  <title>My Realtime App</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f2f2f2; }
+    h1 { color: #333; }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover { background-color: #0056b3; }
+    #response { margin-top: 20px; font-weight: bold; color: green; }
+  </style>
 </head>
 <body>
-  <h1>Welcome to Frontend</h1>
-  <p>We will call backend API here.</p>
+  <h1>🚀 Welcome to Realtime Frontend</h1>
+  <p>Click below to call backend API in realtime.</p>
   <button onclick="callAPI()">Call Backend</button>
-  <p id="response"></p>
+  <p id="response">Waiting for response...</p>
 
   <script>
     function callAPI() {
       fetch('/api/')
         .then(res => res.text())
         .then(data => document.getElementById('response').innerText = data)
-        .catch(err => alert("Error calling backend"));
+        .catch(err => document.getElementById('response').innerText = 'Error calling backend');
     }
   </script>
 </body>
