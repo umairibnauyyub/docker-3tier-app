@@ -1,26 +1,26 @@
 const express = require('express');
-const cors = require('cors'); // <== ADD THIS
+const cors = require('cors');
 const pool = require('./db');
 
 const app = express();
-app.use(cors()); // <== ADD THIS
+app.use(cors());
 app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send('Backend API is working!');
 });
 
-app.get('/test-db', async (req, res) => {
+app.get('/api/', async (req, res) => {
   try {
     const result = await pool.query('SELECT NOW()');
-    res.json(result.rows[0]);
+    res.send(`⏱️ DB Timestamp: ${result.rows[0].now}`);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Database error');
+    res.status(500).send('❌ Database error');
   }
 });
 
 const PORT = 8000;
 app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
+  console.log(`✅ Backend running on port ${PORT}`);
 });
