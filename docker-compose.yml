@@ -1,0 +1,64 @@
+version: '3.8'
+
+services:
+  postgres-db:
+    image: postgres:15
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: myappdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - my-network
+
+  backend:
+    build:
+      context: ./backend
+    container_name: my-app-backend
+    ports:
+      - "8000:8000"
+    environment:
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: myappdb
+      DB_HOST: postgres-db
+      DB_PORT: 5432
+    depends_on:
+      - postgres-db
+    networks:
+      - my-network
+
+  frontend:
+    build:
+      context: ./frontend
+    container_name: my-app-frontend
+      #  ports:
+      # - "8080:80"
+    depends_on:
+      - backend
+    networks:
+      - my-network
+
+  nginx:
+    image: nginx:latest
+    container_name: my-app-nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - my-network
+
+volumes:
+  pgdata:
+
+networks:
+  my-network:
+    driver: bridge

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Frontend</title>
+</head>
+<body>
+  <h1>Welcome to Frontend</h1>
+  <p>We will call backend API here.</p>
+  <button onclick="callAPI()">Call Backend</button>
+  <p id="response"></p>
+
+  <script>
+    function callAPI() {
+      fetch('/api/')
+        .then(res => res.text())
+        .then(data => document.getElementById('response').innerText = data)
+        .catch(err => alert("Error calling backend"));
+    }
+  </script>
+</body>
+</html>
