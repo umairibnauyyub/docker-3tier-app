@@ -36,8 +36,8 @@ services:
     build:
       context: ./frontend
     container_name: my-app-frontend
-    ports:
-      - "8080:80"
+    #ports:
+      #- "8080:80"
     depends_on:
       - backend
     networks:
@@ -47,7 +47,7 @@ services:
     image: nginx:latest
     container_name: my-app-nginx
     ports:
-      - "8081:80"
+      - "80:80"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
