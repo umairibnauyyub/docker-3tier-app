@@ -36,8 +36,8 @@ services:
     build:
       context: ./frontend
     container_name: my-app-frontend
-      #  ports:
-      # - "8080:80"
+    ports:
+      - "8080:80"
     depends_on:
       - backend
     networks:
