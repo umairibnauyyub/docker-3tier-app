@@ -1,11 +1,6 @@
 pipeline {
     agent any
 
-    environment {
-        IMAGE_NAME = "ci-cd-3tier-prod-backend"
-        IMAGE_TAG = "latest"
-    }
-
     stages {
         stage('Clone') {
             steps {
@@ -24,19 +19,25 @@ pipeline {
         stage('Trivy Scan') {
             steps {
                 echo 'Scanning Docker image with Trivy...'
+                // scan backend image
                 sh '''
-                docker image ls
-                trivy image $IMAGE_NAME:$IMAGE_TAG --exit-code 1 --severity HIGH,CRITICAL --format table --output trivy-report.txt
+                    trivy image ci-cd-3tier-prod-backend:latest \
+                    --exit-code 1 \
+                    --severity HIGH,CRITICAL \
+                    --format table \
+                    --output trivy-report.txt
                 '''
+                // show the report in Jenkins Console
+                sh 'cat trivy-report.txt'
             }
         }
 
         stage('Run') {
             when {
-                expression { fileExists('trivy-report.txt') && !readFile('trivy-report.txt').contains('HIGH') }
+                expression { currentBuild.result == null } // Only run if previous stages did not fail
             }
             steps {
-                echo 'Trivy scan passed. Starting app using Docker Compose...'
+                echo 'Running app using Docker Compose...'
                 sh 'docker-compose up -d'
             }
         }
@@ -46,8 +47,13 @@ pipeline {
         always {
             archiveArtifacts artifacts: 'trivy-report.txt', fingerprint: true
         }
+
         failure {
-            echo "❌ Pipeline failed: High/Critical vulnerabilities found in Trivy scan."
+            echo '❌ Pipeline failed: High/Critical vulnerabilities found in Trivy scan.'
+        }
+
+        success {
+            echo '✅ Pipeline succeeded with no critical vulnerabilities.'
         }
     }
 }
