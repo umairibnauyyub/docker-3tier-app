@@ -4,22 +4,21 @@ pipeline {
     stages {
         stage('Clone') {
             steps {
-                echo 'Cloning repository...'
+                echo '📥 Cloning repository...'
                 checkout scm
             }
         }
 
         stage('Build') {
             steps {
-                echo 'Building services using Docker Compose...'
+                echo '🔧 Building services using Docker Compose...'
                 sh 'docker-compose build'
             }
         }
 
         stage('Trivy Scan') {
             steps {
-                echo 'Scanning Docker image with Trivy...'
-                // scan backend image
+                echo '🔍 Scanning Docker image with Trivy for vulnerabilities...'
                 sh '''
                     trivy image ci-cd-3tier-prod-backend:latest \
                     --exit-code 1 \
@@ -27,17 +26,17 @@ pipeline {
                     --format table \
                     --output trivy-report.txt
                 '''
-                // show the report in Jenkins Console
+                echo '📄 Trivy Scan Report:'
                 sh 'cat trivy-report.txt'
             }
         }
 
         stage('Run') {
             when {
-                expression { currentBuild.result == null } // Only run if previous stages did not fail
+                expression { currentBuild.result == null }
             }
             steps {
-                echo 'Running app using Docker Compose...'
+                echo '🚀 Running app using Docker Compose...'
                 sh 'docker-compose up -d'
             }
         }
@@ -45,6 +44,7 @@ pipeline {
 
     post {
         always {
+            echo '📦 Archiving Trivy scan report...'
             archiveArtifacts artifacts: 'trivy-report.txt', fingerprint: true
         }
 
@@ -53,7 +53,7 @@ pipeline {
         }
 
         success {
-            echo '✅ Pipeline succeeded with no critical vulnerabilities.'
+            echo '✅ Pipeline succeeded: No critical vulnerabilities detected.'
         }
     }
 }
