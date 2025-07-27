@@ -31,6 +31,15 @@ pipeline {
             }
         }
 
+        stage('SonarQube Analysis') {
+            steps {
+                echo '📊 Running SonarQube code analysis...'
+                withSonarQubeEnv('SonarQube') {
+                    sh 'sonar-scanner'
+                }
+            }
+        }
+
         stage('Run') {
             when {
                 expression { currentBuild.result == null }
