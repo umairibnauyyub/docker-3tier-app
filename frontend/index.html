@@ -1,35 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>My Realtime App</title>
-  <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f2f2f2; }
-    h1 { color: #333; }
-    button {
-      background-color: #007BFF;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      font-size: 16px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover { background-color: #0056b3; }
-    #response { margin-top: 20px; font-weight: bold; color: green; }
-  </style>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
-  <h1>🚀 Welcome to Realtime Frontend</h1>
-  <p>Click below to call backend API in realtime.</p>
-  <button onclick="callAPI()">Call Backend</button>
-  <p id="response">Waiting for response...</p>
+<body class="bg-light text-center">
+  <div class="container py-5">
+    <h1 class="display-5 fw-bold text-primary mb-4">🚀 Welcome to Realtime Frontend</h1>
+    <p class="lead">Click below to call backend API in realtime.</p>
+    <button onclick="callAPI()" class="btn btn-primary mt-3">Call Backend</button>
+    <p id="response" class="mt-4 fw-semibold text-success"></p>
+  </div>
 
   <script>
     function callAPI() {
       fetch('/api/')
         .then(res => res.text())
         .then(data => document.getElementById('response').innerText = data)
-        .catch(err => document.getElementById('response').innerText = 'Error calling backend');
+        .catch(err => document.getElementById('response').innerText = "Backend call failed!");
     }
   </script>
 </body>
