@@ -2,8 +2,8 @@ pipeline {
     agent any
 
     environment {
-        SONARQUBE_SCANNER = 'SonarQubeScanner' // Jenkins > Global Tool Config m jo naam diya
-        SONARQUBE_SERVER = 'MySonarServer'     // Jenkins > SonarQube servers config ka naam
+        SONARQUBE_SCANNER = 'SonarQubeScanner' // Jenkins Global Tool Config ka naam
+        SONARQUBE_SERVER = 'MySonarServer'     // Jenkins SonarQube Servers config ka naam
     }
 
     stages {
@@ -31,7 +31,6 @@ pipeline {
                     --format table \
                     --output trivy-report.txt || true
                 '''
-                echo '📄 Trivy Scan Report:'
                 sh 'cat trivy-report.txt'
             }
         }
@@ -39,12 +38,14 @@ pipeline {
         stage('SonarQube Analysis') {
             steps {
                 echo '🧪 Running SonarQube Analysis...'
-                withSonarQubeEnv("${SONARQUBE_SERVER}") {
-                    sh "${SONARQUBE_SCANNER}/bin/sonar-scanner \
-                        -Dsonar.projectKey=docker-3tier-app \
-                        -Dsonar.sources=. \
-                        -Dsonar.host.url=$SONAR_HOST_URL \
-                        -Dsonar.login=$SONAR_AUTH_TOKEN"
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
+                    withSonarQubeEnv("${SONARQUBE_SERVER}") {
+                        sh "${SONARQUBE_SCANNER}/bin/sonar-scanner \
+                            -Dsonar.projectKey=docker-3tier-app \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_AUTH_TOKEN"
+                    }
                 }
             }
         }
@@ -59,12 +60,11 @@ pipeline {
 
     post {
         always {
-            echo '📦 Archiving Trivy scan report...'
             archiveArtifacts artifacts: 'trivy-report.txt', fingerprint: true
         }
 
         success {
-            echo '✅ Pipeline succeeded: Trivy report generated, SonarQube analysis done.'
+            echo '✅ Pipeline succeeded: Trivy OK & SonarQube analysis done.'
         }
 
         failure {
